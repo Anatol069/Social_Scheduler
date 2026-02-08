@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Social Scheduler - Login</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+        <div class="card p-4 shadow-sm" style="width: 400px;">
+            <div class="text-center mb-4">
+                <h3 class="text-primary"><i class="fa fa-hashtag me-2"></i>Scheduler</h3>
+                <h5 class="text-muted">Autentificare</h5>
+            </div>
+            
+            <% if (locals.error) { %>
+                <div class="alert alert-danger"><%= error %></div>
+            <% } %>
+
+            <form action="/login" method="POST">
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" name="username" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Parola</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2">Intră în Cont</button>
+            </form>
+
+            <hr>
+            
+            <p class="text-center mb-2 small text-muted">Nu ai cont?</p>
+            <form action="/register" method="POST">
+                <div class="input-group mb-3">
+                    <input type="text" name="username" class="form-control" placeholder="User nou" required>
+                    <input type="password" name="password" class="form-control" placeholder="Parolă nouă" required>
+                    <button class="btn btn-outline-secondary" type="submit">Înregistrează-te</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Social Scheduler - Statistici</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <link href="/img/favicon.ico" rel="icon">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container-fluid position-relative bg-white d-flex p-0">
+
+        <div class="sidebar pe-4 pb-3">
+            <nav class="navbar bg-light navbar-light">
+                <a href="/" class="navbar-brand mx-4 mb-3">
+                    <h3 class="text-primary"><i class="fa fa-hashtag me-2"></i>Scheduler</h3>
+                </a>
+                <div class="navbar-nav w-100">
+                    <a href="/" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+                    <a href="#" class="nav-item nav-link"><i class="fa fa-users me-2"></i>Conturi</a>
+                    <a href="/stats" class="nav-item nav-link active"><i class="fa fa-chart-bar me-2"></i>Statistici</a>
+                    <a href="/calendar" class="nav-item nav-link"><i class="fa fa-calendar-alt me-2"></i>Calendar</a>
+                </div>
+            </nav>
+        </div>
+
+        <div class="content">
+            <nav class="navbar navbar-expand bg-light navbar-light sticky-top px-4 py-0">
+                <a href="/" class="navbar-brand d-flex d-lg-none me-4">
+                    <h2 class="text-primary mb-0"><i class="fa fa-hashtag"></i></h2>
+                </a>
+                <a href="#" class="sidebar-toggler flex-shrink-0"><i class="fa fa-bars"></i></a>
+            </nav>
+
+            <div class="container-fluid pt-4 px-4">
+                <div class="row g-4">
+
+                    <div class="col-sm-12 col-xl-6">
+                        <div class="bg-light rounded h-100 p-4">
+                            <h6 class="mb-4">Distribuția pe Platforme</h6>
+                            <canvas id="platform-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 col-xl-6">
+                        <div class="bg-light rounded h-100 p-4">
+                            <h6 class="mb-4">Performanța Postărilor (Trimise vs. Pending)</h6>
+                            <canvas id="status-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="bg-light rounded h-100 p-4">
+                            <h6 class="mb-4">Sumar General</h6>
+                            <div class="row text-center">
+                                <div class="col-md-4">
+                                    <h1 class="text-primary">
+                                        <%= stats.total %>
+                                    </h1>
+                                    <p>Total Postări</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <h1 class="text-success">
+                                        <%= stats.sent %>
+                                    </h1>
+                                    <p>Trimise cu Succes</p>
+                                </div>
+                                <div class="col-md-4">
+                                    <h1 class="text-warning">
+                                        <%= stats.pending %>
+                                    </h1>
+                                    <p>În Așteptare</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/main.js"></script>
+
+    <script>
+        // 1. GRAFICUL PLĂCINTĂ (Platforms)
+        const ctx1 = document.getElementById('platform-chart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'pie',
+            data: {
+                labels: ['Facebook', 'LinkedIn', 'Instagram', 'Twitter'],
+                datasets: [{
+                    data: [<%= stats.facebook %>, <%= stats.linkedin %>, <%= stats.instagram %>, <%= stats.twitter %>],
+                    backgroundColor: [
+                        '#0d6efd', // Albastru (FB)
+                        '#0dcaf0', // Cyan (LinkedIn)
+                        '#dc3545', // Rosu (Insta)
+                        '#6c757d'  // Gri (Twitter)
+                    ]
+                }]
+            }
+        });
+
+        // 2. GRAFICUL BARE (Status)
+        const ctx2 = document.getElementById('status-chart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['Trimise', 'În Așteptare'],
+                datasets: [{
+                    label: 'Postări',
+                    data: [<%= stats.sent %>, <%= stats.pending %>],
+                    backgroundColor: ['#198754', '#ffc107']
+                }]
+            },
+            options: { scales: { y: { beginAtZero: true } } }
+        });
+    </script>
+</body>
+
+</html>
