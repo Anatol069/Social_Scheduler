@@ -275,3 +275,90 @@
     background: var(--dark);
     border-color: var(--primary);
 }
+
+/* --- STILURI NOI PENTRU LOGIN PAGE --- */
+
+.login-container {
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* Partea stângă - Imaginea */
+.login-image-side {
+    /* Imagine de fundal (poți schimba URL-ul cu altă imagine dacă vrei) */
+    background: url('https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1974&auto=format&fit=crop') no-repeat center center;
+    background-size: cover;
+    position: relative;
+    min-height: 100vh;
+}
+
+/* Overlay întunecat peste imagine ca să se citească textul */
+.login-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(0, 123, 255, 0.8), rgba(102, 16, 242, 0.8));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    padding: 2rem;
+}
+
+/* Partea dreaptă - Formularul */
+.login-form-side {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    background-color: #f8f9fa;
+}
+
+.form-wrapper {
+    width: 100%;
+    max-width: 450px;
+    background: white;
+    padding: 2.5rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* Input-uri mai moderne */
+.modern-input {
+    border: 2px solid #eee;
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    transition: all 0.3s;
+}
+
+.modern-input:focus {
+    border-color: #009CFF;
+    /* Culoarea primary din tema ta */
+    box-shadow: 0 0 0 4px rgba(0, 156, 255, 0.1);
+}
+
+.btn-modern {
+    border-radius: 10px;
+    padding: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Link-ul de comutare */
+.toggle-link {
+    color: #009CFF;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.toggle-link:hover {
+    text-decoration: underline;
+}
+
+/* Ascundem formularul care nu e activ */
+.hidden {
+    display: none;
+}

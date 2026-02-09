@@ -1,47 +1,154 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ro">
+
 <head>
     <meta charset="utf-8">
-    <title>Social Scheduler - Login</title>
+    <title>Login - Social Scheduler</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <link href="/img/favicon.ico" rel="icon">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link href="/lib/owlcarousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="/lib/tempusdominus/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+
     <link href="/css/bootstrap.min.css" rel="stylesheet">
+
     <link href="/css/style.css" rel="stylesheet">
 </head>
-<body class="bg-light">
-    <div class="container d-flex align-items-center justify-content-center" style="min-height: 100vh;">
-        <div class="card p-4 shadow-sm" style="width: 400px;">
-            <div class="text-center mb-4">
-                <h3 class="text-primary"><i class="fa fa-hashtag me-2"></i>Scheduler</h3>
-                <h5 class="text-muted">Autentificare</h5>
+
+<body>
+    <div class="container-fluid login-container p-0">
+        <div class="row g-0">
+            <div class="col-lg-6 d-none d-lg-block login-image-side">
+                <div class="login-image-overlay text-center">
+                    <div>
+                        <h1 class="display-4 fw-bold text-white mb-4">
+                            <i class="fa fa-hashtag me-2"></i>Social Scheduler
+                        </h1>
+                        <p class="lead text-white-50 mb-4">
+                            Planifică-ți prezența online inteligent. <br>
+                            Proiect de Licență 2026.
+                        </p>
+                        <div class="d-flex gap-3 justify-content-center fs-4 text-white-50">
+                            <i class="fab fa-facebook"></i>
+                            <i class="fab fa-twitter"></i>
+                            <i class="fab fa-instagram"></i>
+                            <i class="fab fa-linkedin"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
-            
-            <% if (locals.error) { %>
-                <div class="alert alert-danger"><%= error %></div>
-            <% } %>
 
-            <form action="/login" method="POST">
-                <div class="mb-3">
-                    <label class="form-label">Username</label>
-                    <input type="text" name="username" class="form-control" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Parola</label>
-                    <input type="password" name="password" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-100 py-2">Intră în Cont</button>
-            </form>
+            <div class="col-lg-6 login-form-side">
+                <div class="form-wrapper">
+                    <div class="text-center d-lg-none mb-4">
+                        <h2 class="text-primary fw-bold"><i class="fa fa-hashtag me-2"></i>Scheduler</h2>
+                    </div>
 
-            <hr>
-            
-            <p class="text-center mb-2 small text-muted">Nu ai cont?</p>
-            <form action="/register" method="POST">
-                <div class="input-group mb-3">
-                    <input type="text" name="username" class="form-control" placeholder="User nou" required>
-                    <input type="password" name="password" class="form-control" placeholder="Parolă nouă" required>
-                    <button class="btn btn-outline-secondary" type="submit">Înregistrează-te</button>
+                    <% if (error) { %>
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fa fa-exclamation-circle me-2"></i> <%= error %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    <% } %>
+
+                    <div id="loginBox">
+                        <h3 class="mb-4 fw-bold text-dark">Bine ai revenit! 👋</h3>
+                        <p class="text-muted mb-4">Introdu datele pentru a accesa dashboard-ul.</p>
+                        
+                        <form action="/login" method="POST">
+                            <div class="mb-3">
+                                <label class="form-label text-muted fw-bold small">USERNAME</label>
+                                <div class="input-group">
+                                    <span class="input-group-text border-0 bg-light"><i class="fa fa-user text-primary"></i></span>
+                                    <input type="text" class="form-control modern-input ps-2" name="username" placeholder="Ex: anatol" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="form-label text-muted fw-bold small">PAROLA</label>
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-group-text border-0 bg-light"><i class="fa fa-lock text-primary"></i></span>
+                                    <input type="password" class="form-control modern-input ps-2" name="password" placeholder="••••••" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-modern w-100">Autentificare <i class="fa fa-arrow-right ms-2"></i></button>
+                        </form>
+
+                        <div class="text-center mt-4 text-muted">
+                            Nu ai un cont încă? 
+                            <span class="toggle-link" onclick="showRegister()">Creează unul acum</span>
+                        </div>
+                    </div>
+
+                    <div id="registerBox" class="hidden">
+                        <h3 class="mb-4 fw-bold text-dark">Creează cont nou 🚀</h3>
+                        <p class="text-muted mb-4">Durează mai puțin de un minut.</p>
+
+                        <form action="/register" method="POST">
+                            <div class="mb-3">
+                                <label class="form-label text-muted fw-bold small">USERNAME DORIT</label>
+                                <div class="input-group">
+                                    <span class="input-group-text border-0 bg-light"><i class="fa fa-user-plus text-primary"></i></span>
+                                    <input type="text" class="form-control modern-input ps-2" name="username" placeholder="Alege un nume unic" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label text-muted fw-bold small">PAROLA</label>
+                                <div class="input-group">
+                                    <span class="input-group-text border-0 bg-light"><i class="fa fa-lock text-primary"></i></span>
+                                    <input type="password" class="form-control modern-input ps-2" name="password" placeholder="Minimum 6 caractere" required minlength="6">
+                                </div>
+                                <small class="text-muted">Folosește o parolă puternică.</small>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-modern w-100">Înregistrează-te</button>
+                        </form>
+
+                        <div class="text-center mt-4 text-muted">
+                            Ai deja cont? 
+                            <span class="toggle-link" onclick="showLogin()">Înapoi la Autentificare</span>
+                        </div>
+                    </div>
+
                 </div>
-            </form>
+            </div>
         </div>
     </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/lib/chart/chart.min.js"></script>
+    <script src="/lib/easing/easing.min.js"></script>
+    <script src="/lib/waypoints/waypoints.min.js"></script>
+    <script src="/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="/lib/tempusdominus/js/moment.min.js"></script>
+    <script src="/lib/tempusdominus/js/moment-timezone.min.js"></script>
+    <script src="/lib/tempusdominus/js/tempusdominus-bootstrap-4.min.js"></script>
+
+    <script src="/js/main.js"></script>
+
+    <script>
+        const loginBox = document.getElementById('loginBox');
+        const registerBox = document.getElementById('registerBox');
+
+        function showRegister() {
+            loginBox.classList.add('hidden');
+            registerBox.classList.remove('hidden');
+        }
+
+        function showLogin() {
+            registerBox.classList.add('hidden');
+            loginBox.classList.remove('hidden');
+        }
+    </script>
 </body>
+
 </html>
