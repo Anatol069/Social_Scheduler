@@ -4,10 +4,10 @@ const path = require('path');
 const sql = require('mssql');
 const cron = require('node-cron');
 const multer = require('multer');
-const bcrypt = require('bcrypt');           // <--- NOU
-const session = require('express-session'); // <--- NOU
+const bcrypt = require('bcrypt');
+const session = require('express-session');
 
-// --- CONFIGURARE SQL ---
+// --- 1. CONFIGURARE BAZA DE DATE ---
 const dbConfig = {
     user: 'sa',
     password: '123456',
@@ -19,14 +19,14 @@ const dbConfig = {
     }
 };
 
-// --- CONFIGURARE SESIUNI (NOU) ---
+// --- 2. CONFIGURARE SESIUNI ---
 app.use(session({
-    secret: 'licenta_secret_key_2026', // Cheia secretă
+    secret: 'licenta_secret_key_2026',
     resave: false,
     saveUninitialized: false
 }));
 
-// --- CONFIGURARE MULTER ---
+// --- 3. UPLOAD POZE ---
 const storage = multer.diskStorage({
     destination: './public/uploads/',
     filename: function (req, file, cb) {
@@ -49,164 +49,146 @@ function getIcon(platform) {
     return 'fa fa-hashtag';
 }
 
-// === MIDDLEWARE DE PROTECȚIE (NOU) ===
-// Această funcție păzește paginile. Dacă nu ești logat, te trimite la Login.
-function checkAuth(req, res, next) {
-    if (req.session.user) {
-        next(); // Ești logat, poți trece
-    } else {
-        res.redirect('/login'); // Stop! Mergi la login.
-    }
+// === FUNCȚII DE FORMATARE A OREI (FĂRĂ FUS ORAR - TEXT PUR) ===
+
+// 1. Pentru LISTA (Ex: 09.02.2026 14:00)
+function formatDateManual(dateObj) {
+    if (!dateObj) return '';
+    const d = new Date(dateObj);
+    // Folosim UTC pentru a citi exact ce e în bază, fără ajustări locale
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const year = d.getUTCFullYear();
+    const hour = String(d.getUTCHours()).padStart(2, '0');
+    const min = String(d.getUTCMinutes()).padStart(2, '0');
+    return `${day}.${month}.${year} ${hour}:${min}`;
 }
 
-// === RUTE DE AUTENTIFICARE (NOU) ===
+// 2. Pentru EDITARE (Ex: 2026-02-09T14:00)
+function formatInputManual(dateObj) {
+    if (!dateObj) return '';
+    const d = new Date(dateObj);
+    const year = d.getUTCFullYear();
+    const month = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(d.getUTCDate()).padStart(2, '0');
+    const hour = String(d.getUTCHours()).padStart(2, '0');
+    const min = String(d.getUTCMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hour}:${min}`;
+}
 
-// 1. Pagina de Login
-app.get('/login', (req, res) => {
-    res.render('login', { error: null });
-});
+// === MIDDLEWARE DE PROTECȚIE ===
+function checkAuth(req, res, next) {
+    if (req.session.user) next(); else res.redirect('/login');
+}
 
-// 2. Acțiunea de Register
+// === RUTE AUTENTIFICARE ===
+app.get('/login', (req, res) => { res.render('login', { error: null }); });
+
 app.post('/register', async (req, res) => {
     try {
-        const { username, password } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10); // Criptăm parola
-        
+        const hashedPassword = await bcrypt.hash(req.body.password, 10);
         let pool = await sql.connect(dbConfig);
-        await pool.request()
-            .input('user', sql.NVarChar, username)
-            .input('pass', sql.NVarChar, hashedPassword)
-            .query("INSERT INTO Users (Username, Password) VALUES (@user, @pass)");
-            
-        res.render('login', { error: 'Cont creat cu succes! Te poți loga.' });
-    } catch (err) {
-        res.render('login', { error: 'Eroare: Acest username există deja.' });
-    }
+        await pool.request().input('user', sql.NVarChar, req.body.username).input('pass', sql.NVarChar, hashedPassword).query("INSERT INTO Users (Username, Password) VALUES (@user, @pass)");
+        res.render('login', { error: 'Cont creat! Te poți loga.' });
+    } catch (err) { res.render('login', { error: 'User existent.' }); }
 });
 
-// 3. Acțiunea de Login
 app.post('/login', async (req, res) => {
     try {
-        const { username, password } = req.body;
         let pool = await sql.connect(dbConfig);
-        let result = await pool.request()
-            .input('user', sql.NVarChar, username)
-            .query("SELECT * FROM Users WHERE Username = @user");
-
+        let result = await pool.request().input('user', sql.NVarChar, req.body.username).query("SELECT * FROM Users WHERE Username = @user");
         const user = result.recordset[0];
-
-        if (user && await bcrypt.compare(password, user.Password)) {
-            req.session.user = user; // Salvăm userul în sesiune
-            res.redirect('/');       // Îl trimitem la Dashboard
-        } else {
-            res.render('login', { error: 'Username sau parolă greșită!' });
-        }
-    } catch (err) {
-        res.send("Eroare server: " + err.message);
-    }
+        if (user && await bcrypt.compare(req.body.password, user.Password)) {
+            req.session.user = user; res.redirect('/');
+        } else { res.render('login', { error: 'Date incorecte!' }); }
+    } catch (err) { res.send(err.message); }
 });
 
-// 4. Logout
-app.get('/logout', (req, res) => {
-    req.session.destroy(() => {
-        res.redirect('/login');
-    });
-});
+app.get('/logout', (req, res) => { req.session.destroy(() => res.redirect('/login')); });
 
+// === RUTE APLICAȚIE ===
 
-// === RUTELE APLICAȚIEI (TOATE PROTEJATE CU checkAuth) ===
-
-// 1. RUTA PRINCIPALĂ (Dashboard + Filtrare)
+// DASHBOARD
 app.get('/', checkAuth, async (req, res) => {
     try {
         let pool = await sql.connect(dbConfig);
         const platformFilter = req.query.platform || 'All';
         const statusFilter = req.query.status || 'All';
-
         let query = 'SELECT * FROM Posts WHERE 1=1';
         if (platformFilter !== 'All') query += ` AND Platform = '${platformFilter}'`;
         if (statusFilter !== 'All') query += ` AND Status = '${statusFilter}'`;
         query += ' ORDER BY PostDate ASC';
 
         let result = await pool.request().query(query);
-        let posts = result.recordset.map(post => {
-            return {
-                id: post.Id, platform: post.Platform, message: post.Message,
-                datetime: post.PostDate.toISOString(), status: post.Status,
-                image: post.ImagePath, icon: getIcon(post.Platform)
-            };
-        });
+        let posts = result.recordset.map(post => ({
+            id: post.Id, platform: post.Platform, message: post.Message,
+            datetime: formatDateManual(post.PostDate), // <--- Format curat
+            status: post.Status, image: post.ImagePath, icon: getIcon(post.Platform)
+        }));
 
-        // Trimitem userul către interfață (req.session.user)
-        res.render('index', {
-            posts: posts,
-            postToEdit: null,
-            filters: { platform: platformFilter, status: statusFilter },
-            user: req.session.user 
-        });
-
-    } catch (err) { console.log(err); res.send("Eroare: " + err.message); }
+        res.render('index', { posts: posts, postToEdit: null, filters: { platform: platformFilter, status: statusFilter }, user: req.session.user });
+    } catch (err) { res.send(err.message); }
 });
 
-// 2. RUTA EDITARE
+// EDITARE
 app.get('/edit/:id', checkAuth, async (req, res) => {
     try {
         let pool = await sql.connect(dbConfig);
         let resultAll = await pool.request().query('SELECT * FROM Posts ORDER BY PostDate ASC');
-        let posts = resultAll.recordset.map(post => ({
-            id: post.Id, platform: post.Platform, message: post.Message,
-            datetime: post.PostDate.toISOString(), status: post.Status,
-            image: post.ImagePath, icon: getIcon(post.Platform)
+        let posts = resultAll.recordset.map(post => ({ 
+            id: post.Id, platform: post.Platform, message: post.Message, 
+            datetime: formatDateManual(post.PostDate), 
+            status: post.Status, image: post.ImagePath, icon: getIcon(post.Platform) 
         }));
-
         let resultOne = await pool.request().input('id', sql.Int, req.params.id).query('SELECT * FROM Posts WHERE Id = @id');
         let postToEdit = resultOne.recordset[0];
-        if (postToEdit) postToEdit.formattedDate = postToEdit.PostDate.toISOString().slice(0, 16);
+        if (postToEdit) postToEdit.formattedDate = formatInputManual(postToEdit.PostDate);
 
-        res.render('index', { 
-            posts: posts, 
-            postToEdit: postToEdit, 
-            filters: {platform: 'All', status: 'All'},
-            user: req.session.user 
-        });
-
-    } catch (err) { console.log(err); res.send("Eroare editare: " + err.message); }
+        res.render('index', { posts: posts, postToEdit: postToEdit, filters: {platform: 'All', status: 'All'}, user: req.session.user });
+    } catch (err) { res.send(err.message); }
 });
 
-// 3. RUTA UPDATE
-app.post('/update/:id', checkAuth, upload.single('image'), async (req, res) => {
-    try {
-        let pool = await sql.connect(dbConfig);
-        const id = req.params.id;
-        if (req.file) {
-            await pool.request().input('id', sql.Int, id).input('platform', sql.NVarChar, req.body.platform).input('message', sql.NVarChar, req.body.message).input('postDate', sql.DateTime, new Date(req.body.datetime)).input('imagePath', sql.NVarChar, req.file.filename).query(`UPDATE Posts SET Platform=@platform, Message=@message, PostDate=@postDate, ImagePath=@imagePath WHERE Id=@id`);
-        } else {
-            await pool.request().input('id', sql.Int, id).input('platform', sql.NVarChar, req.body.platform).input('message', sql.NVarChar, req.body.message).input('postDate', sql.DateTime, new Date(req.body.datetime)).query(`UPDATE Posts SET Platform=@platform, Message=@message, PostDate=@postDate WHERE Id=@id`);
-        }
-        res.redirect('/');
-    } catch (err) { console.log(err); res.send("Eroare la update: " + err.message); }
-});
-
-// 4. RUTA CREARE
+// SALVARE (SCHEDULE) - Salvăm ca STRING
 app.post('/schedule', checkAuth, upload.single('image'), async (req, res) => {
     try {
         const imageFilename = req.file ? req.file.filename : null;
         let pool = await sql.connect(dbConfig);
-        await pool.request().input('platform', sql.NVarChar, req.body.platform).input('message', sql.NVarChar, req.body.message).input('postDate', sql.DateTime, new Date(req.body.datetime)).input('imagePath', sql.NVarChar, imageFilename).query("INSERT INTO Posts (Platform, Message, PostDate, Status, ImagePath) VALUES (@platform, @message, @postDate, 'Pending', @imagePath)");
+        
+        // TRUC: Scoatem 'T'-ul și salvăm string-ul exact
+        let cleanDate = req.body.datetime.replace('T', ' '); 
+
+        await pool.request()
+            .input('platform', sql.NVarChar, req.body.platform)
+            .input('message', sql.NVarChar, req.body.message)
+            .input('postDate', sql.NVarChar, cleanDate) 
+            .input('imagePath', sql.NVarChar, imageFilename)
+            .query("INSERT INTO Posts (Platform, Message, PostDate, Status, ImagePath) VALUES (@platform, @message, CAST(@postDate AS DATETIME), 'Pending', @imagePath)");
         res.redirect('/');
     } catch (err) { console.log(err); res.send("Eroare: " + err.message); }
 });
 
-// 5. RUTA ȘTERGERE
-app.post('/delete/:id', checkAuth, async (req, res) => {
-    try {
+// UPDATE - Salvăm ca STRING
+app.post('/update/:id', checkAuth, upload.single('image'), async (req, res) => {
+     try {
         let pool = await sql.connect(dbConfig);
-        await pool.request().input('id', sql.Int, req.params.id).query('DELETE FROM Posts WHERE Id = @id');
+        let cleanDate = req.body.datetime.replace('T', ' '); 
+        const id = req.params.id;
+
+        if (req.file) {
+            await pool.request().input('id', sql.Int, id).input('platform', sql.NVarChar, req.body.platform).input('message', sql.NVarChar, req.body.message).input('postDate', sql.NVarChar, cleanDate).input('imagePath', sql.NVarChar, req.file.filename).query(`UPDATE Posts SET Platform=@platform, Message=@message, PostDate=CAST(@postDate AS DATETIME), ImagePath=@imagePath WHERE Id=@id`);
+        } else {
+            await pool.request().input('id', sql.Int, id).input('platform', sql.NVarChar, req.body.platform).input('message', sql.NVarChar, req.body.message).input('postDate', sql.NVarChar, cleanDate).query(`UPDATE Posts SET Platform=@platform, Message=@message, PostDate=CAST(@postDate AS DATETIME) WHERE Id=@id`);
+        }
         res.redirect('/');
-    } catch (err) { res.send("Eroare: " + err.message); }
+    } catch (err) { res.send("Eroare update: " + err.message); }
 });
 
-// 6. RUTA STATISTICI
+app.post('/delete/:id', checkAuth, async (req, res) => {
+    try { let pool = await sql.connect(dbConfig); await pool.request().input('id', sql.Int, req.params.id).query('DELETE FROM Posts WHERE Id = @id'); res.redirect('/'); } catch (err) { res.send(err.message); }
+});
+
+app.get('/calendar', checkAuth, (req, res) => { res.render('calendar', { user: req.session.user }); });
+
 app.get('/stats', checkAuth, async (req, res) => {
     try {
         let pool = await sql.connect(dbConfig);
@@ -222,27 +204,23 @@ app.get('/stats', checkAuth, async (req, res) => {
             pending: posts.filter(p => p.Status === 'Pending').length
         };
         res.render('stats', { stats: stats, user: req.session.user });
-    } catch (err) { console.log(err); res.send("Eroare statistici: " + err.message); }
+    } catch (err) { res.send("Eroare: " + err.message); }
 });
 
-// 7. RUTA CALENDAR
-app.get('/calendar', checkAuth, (req, res) => {
-    res.render('calendar', { user: req.session.user });
-});
-
-// 8. RUTA API EVENTS
 app.get('/api/events', checkAuth, async (req, res) => {
     try {
         let pool = await sql.connect(dbConfig);
         let result = await pool.request().query('SELECT * FROM Posts');
         let events = result.recordset.map(post => {
-            let color = '#6c757d';
-            if (post.Platform === 'Facebook') color = '#0d6efd';
-            if (post.Platform === 'Instagram') color = '#dc3545';
-            if (post.Platform === 'LinkedIn') color = '#0dcaf0';
+            let color = '#6c757d'; // Default (Gri)
+            if (post.Platform === 'Facebook') color = '#0d6efd'; // Albastru
+            if (post.Platform === 'Instagram') color = '#dc3545'; // Roșu/Roz
+            if (post.Platform === 'LinkedIn') color = '#0dcaf0'; // Cyan
+            if (post.Platform === 'Twitter') color = '#000000'; // Negru
+            
             return {
                 title: `${post.Platform}: ${post.Message.substring(0, 20)}...`,
-                start: post.PostDate,
+                start: formatInputManual(post.PostDate), // ISO format pentru calendar
                 backgroundColor: color, borderColor: color,
                 url: `/edit/${post.Id}`
             };
@@ -251,23 +229,41 @@ app.get('/api/events', checkAuth, async (req, res) => {
     } catch (err) { res.status(500).send(err.message); }
 });
 
-// --- ROBOTUL AUTOMAT ---
+// ==============================================
+//               ROBOTUL SIMULATOR 🤖
+// ==============================================
 cron.schedule('* * * * *', async () => {
     try {
         let pool = await sql.connect(dbConfig);
+        
+        // 1. Găsim postările care sunt "Pending" și au data trecută sau prezentă
+        // (SQL face comparația corectă acum pentru că am salvat data corect)
         let result = await pool.request().query("SELECT * FROM Posts WHERE Status = 'Pending' AND PostDate <= GETDATE()");
         const postsToSend = result.recordset;
+
         if (postsToSend.length > 0) {
-            console.log(`🔥 Robot: Trimit ${postsToSend.length} postări...`);
+            console.log(`🔥 [ROBOT] Am găsit ${postsToSend.length} postări de trimis.`);
+            
             for (let post of postsToSend) {
-                console.log(`🚀 SENT: ${post.Platform} - ${post.Message}`);
-                await pool.request().input('id', sql.Int, post.Id).query("UPDATE Posts SET Status = 'Sent' WHERE Id = @id");
+                console.log(`📡 [SIMULARE] Conectare la API ${post.Platform}...`);
+                console.log(`   📝 Mesaj: "${post.Message}"`);
+                
+                // SIMULARE TIMP DE AȘTEPTARE (ca să pară că "lucrează")
+                // Așteptăm 2 secunde
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                console.log(`✅ [SUCCES] Postarea ${post.Id} a fost publicată pe ${post.Platform}!`);
+
+                // ACTUALIZĂM STATUSUL ÎN BAZA DE DATE
+                await pool.request()
+                    .input('id', sql.Int, post.Id)
+                    .query("UPDATE Posts SET Status = 'Sent' WHERE Id = @id");
             }
         }
-    } catch (err) { console.log(err); }
+    } catch (err) { console.log("Eroare Robot:", err); }
 });
 
 const PORT = 3000;
 app.listen(PORT, () => {
-    console.log(`Serverul ruleaza la http://localhost:${PORT}`);
+    console.log(`Serverul SocialScheduler ruleaza la http://localhost:${PORT}`);
 });
