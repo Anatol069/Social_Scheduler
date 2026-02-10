@@ -161,10 +161,15 @@ app.get('/edit/:id', checkAuth, async (req, res) => {
 });
 
 // SALVARE
+// MODIFICAT: Suport pentru Draft-uri (Ciorne)
 app.post('/schedule', checkAuth, upload.single('image'), async (req, res) => {
     try {
         const imageFilename = req.file ? req.file.filename : null;
         let pool = await sql.connect(dbConfig);
+
+        // Verificăm dacă utilizatorul a apăsat pe butonul "Salvează Ciornă"
+        const status = req.body.action === 'draft' ? 'Draft' : 'Pending';
+
         let cleanDate = req.body.datetime.replace('T', ' ');
 
         await pool.request()
@@ -172,7 +177,9 @@ app.post('/schedule', checkAuth, upload.single('image'), async (req, res) => {
             .input('message', sql.NVarChar, req.body.message)
             .input('postDate', sql.NVarChar, cleanDate)
             .input('imagePath', sql.NVarChar, imageFilename)
-            .query("INSERT INTO Posts (Platform, Message, PostDate, Status, ImagePath) VALUES (@platform, @message, CAST(@postDate AS DATETIME), 'Pending', @imagePath)");
+            .input('status', sql.NVarChar, status) // Folosim variabila status
+            .query("INSERT INTO Posts (Platform, Message, PostDate, Status, ImagePath) VALUES (@platform, @message, CAST(@postDate AS DATETIME), @status, @imagePath)");
+
         res.redirect('/');
     } catch (err) { console.log(err); res.send("Eroare: " + err.message); }
 });

@@ -362,3 +362,123 @@
 .hidden {
     display: none;
 }
+
+/* === 🎨 MODERN UI OVERHAUL 2026 === */
+
+:root {
+    --primary-gradient: linear-gradient(135deg, #009CFF 0%, #007bff 100%);
+    --secondary-gradient: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    --success-gradient: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    --glass-bg: rgba(255, 255, 255, 0.95);
+    --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 15px 35px rgba(0, 156, 255, 0.15);
+}
+
+body {
+    background-color: #f3f6f9;
+    /* Un gri foarte deschis, modern */
+    font-family: 'Heebo', sans-serif;
+}
+
+/* 1. CARDURI MODERNE (Soft UI) */
+.bg-light,
+.bg-white {
+    background-color: #ffffff !important;
+    border-radius: 20px !important;
+    /* Colțuri mai rotunde */
+    box-shadow: var(--shadow-soft);
+    border: 1px solid rgba(0, 0, 0, 0.02);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bg-light:hover {
+    transform: translateY(-5px);
+    /* Se ridică puțin la hover */
+    box-shadow: var(--shadow-hover);
+}
+
+/* 2. SIDEBAR MODERN */
+.sidebar {
+    background: #ffffff;
+    box-shadow: 5px 0 25px rgba(0, 0, 0, 0.03);
+}
+
+.sidebar .navbar-nav .nav-link {
+    border-radius: 12px;
+    margin: 5px 15px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.sidebar .navbar-nav .nav-link.active {
+    background: rgba(0, 156, 255, 0.1);
+    /* Albastru foarte pal */
+    color: #009CFF !important;
+    border-left: none;
+    /* Scoatem linia veche */
+    box-shadow: none;
+}
+
+.sidebar .navbar-nav .nav-link:hover {
+    background: #f8f9fa;
+    color: #009CFF;
+    transform: translateX(5px);
+    /* Se mișcă spre dreapta */
+}
+
+/* 3. BUTOANE CU GRADIENT */
+.btn-primary {
+    background: var(--primary-gradient);
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 156, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(0, 156, 255, 0.4);
+}
+
+/* 4. LISTA DE POSTĂRI (Timeline Style) */
+.post-item {
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.post-item:hover {
+    background-color: #f8faff;
+    border-left: 4px solid #009CFF;
+}
+
+.platform-icon-bg {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 1.2rem;
+}
+
+/* Culori specifice pentru iconițe */
+.icon-facebook {
+    background: rgba(24, 119, 242, 0.1);
+    color: #1877F2;
+}
+
+.icon-instagram {
+    background: rgba(225, 48, 108, 0.1);
+    color: #E1306C;
+}
+
+.icon-twitter {
+    background: rgba(29, 161, 242, 0.1);
+    color: #1DA1F2;
+}
+
+/* Sau negru pentru X */
+.icon-linkedin {
+    background: rgba(10, 102, 194, 0.1);
+    color: #0A66C2;
+}
