@@ -6,8 +6,10 @@ const cron = require('node-cron');
 const multer = require('multer');
 const bcrypt = require('bcrypt');
 const session = require('express-session');
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
-// --- CONFIGURARE BAZA DE DATE ---
+// === CONFIGURARE BAZA DE DATE ===
 const dbConfig = {
     user: 'sa',
     password: '123456',
@@ -19,12 +21,54 @@ const dbConfig = {
     }
 };
 
-// --- CONFIGURARE SESIUNI ---
+// === CONFIGURARE SESIUNI ===
 app.use(session({
     secret: 'licenta_secret_key_2026',
     resave: false,
     saveUninitialized: false
 }));
+
+// === CONFIGURARE GOOGLE LOGIN ===
+app.use(passport.initialize());
+
+// ⚠️ CHEILE GOOGLE (Lăsate așa cum le-ai pus tu)
+passport.use(new GoogleStrategy({
+    clientID: '1054013310746-q2q8iqhmslq1tai584hk52970riij0g4.apps.googleusercontent.com',
+    clientSecret: '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',
+    callbackURL: "http://localhost:3000/auth/google/callback"
+},
+    async function (accessToken, refreshToken, profile, cb) {
+        try {
+            let pool = await sql.connect(dbConfig);
+
+            // 1. Verificăm dacă userul există deja (după GoogleId)
+            let result = await pool.request()
+                .input('googleId', sql.NVarChar, profile.id)
+                .query("SELECT * FROM Users WHERE GoogleId = @googleId");
+
+            let user = result.recordset[0];
+
+            if (!user) {
+                // 2. Dacă NU există, îl creăm acum (User nou)
+                const email = profile.emails[0].value;
+                const username = profile.displayName;
+
+                await pool.request()
+                    .input('user', sql.NVarChar, username)
+                    .input('email', sql.NVarChar, email)
+                    .input('googleId', sql.NVarChar, profile.id)
+                    .query("INSERT INTO Users (Username, Email, GoogleId) VALUES (@user, @email, @googleId)");
+
+                // Îl selectăm din nou ca să avem datele complete (inclusiv ID)
+                let newUserResult = await pool.request()
+                    .input('googleId', sql.NVarChar, profile.id)
+                    .query("SELECT * FROM Users WHERE GoogleId = @googleId");
+                user = newUserResult.recordset[0];
+            }
+            return cb(null, user);
+        } catch (err) { return cb(err, null); }
+    }
+));
 
 // --- UPLOAD POZE ---
 const storage = multer.diskStorage({
@@ -77,26 +121,56 @@ function checkAuth(req, res, next) {
     if (req.session.user) next(); else res.redirect('/login');
 }
 
-// === RUTE AUTENTIFICARE ===
+// ==============================================
+// === RUTE AUTENTIFICARE (Email & Parola) ===
+// ==============================================
+
 app.get('/login', (req, res) => { res.render('login', { error: null }); });
 
+// 1. ÎNREGISTRARE PE BAZĂ DE EMAIL (MODIFICAT)
 app.post('/register', async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        const email = req.body.email; // Luăm email-ul din formular
+        
+        // Generăm un username automat din email (ex: "ion" din "ion@gmail.com")
+        const generatedUsername = email.split('@')[0];
+
         let pool = await sql.connect(dbConfig);
-        await pool.request().input('user', sql.NVarChar, req.body.username).input('pass', sql.NVarChar, hashedPassword).query("INSERT INTO Users (Username, Password) VALUES (@user, @pass)");
-        res.render('login', { error: 'Cont creat! Te poți loga.' });
-    } catch (err) { res.render('login', { error: 'User existent.' }); }
+        
+        // Inserăm Userul (Username, Email, Password)
+        await pool.request()
+            .input('user', sql.NVarChar, generatedUsername)
+            .input('email', sql.NVarChar, email)
+            .input('pass', sql.NVarChar, hashedPassword)
+            .query("INSERT INTO Users (Username, Email, Password) VALUES (@user, @email, @pass)");
+            
+        res.render('login', { error: 'Cont creat! Te poți loga cu email-ul.' });
+    } catch (err) { 
+        console.log(err);
+        // Dacă eroarea e de la baza de date (ex: email duplicat)
+        res.render('login', { error: 'Eroare la înregistrare (posibil email existent).' }); 
+    }
 });
 
+// 2. LOGARE PE BAZĂ DE EMAIL (MODIFICAT)
 app.post('/login', async (req, res) => {
     try {
         let pool = await sql.connect(dbConfig);
-        let result = await pool.request().input('user', sql.NVarChar, req.body.username).query("SELECT * FROM Users WHERE Username = @user");
+        
+        // Căutăm după EMAIL, nu după Username
+        let result = await pool.request()
+            .input('email', sql.NVarChar, req.body.username) // În form name="username" dar userul introduce email
+            .query("SELECT * FROM Users WHERE Email = @email");
+            
         const user = result.recordset[0];
-        if (user && await bcrypt.compare(req.body.password, user.Password)) {
-            req.session.user = user; res.redirect('/');
-        } else { res.render('login', { error: 'Date incorecte!' }); }
+
+        if (user && user.Password && await bcrypt.compare(req.body.password, user.Password)) {
+            req.session.user = user; 
+            res.redirect('/');
+        } else { 
+            res.render('login', { error: 'Email sau parolă incorectă!' }); 
+        }
     } catch (err) { res.send(err.message); }
 });
 
@@ -161,7 +235,6 @@ app.get('/edit/:id', checkAuth, async (req, res) => {
 });
 
 // SALVARE
-// MODIFICAT: Suport pentru Draft-uri (Ciorne)
 app.post('/schedule', checkAuth, upload.single('image'), async (req, res) => {
     try {
         const imageFilename = req.file ? req.file.filename : null;
@@ -177,22 +250,40 @@ app.post('/schedule', checkAuth, upload.single('image'), async (req, res) => {
             .input('message', sql.NVarChar, req.body.message)
             .input('postDate', sql.NVarChar, cleanDate)
             .input('imagePath', sql.NVarChar, imageFilename)
-            .input('status', sql.NVarChar, status) // Folosim variabila status
+            .input('status', sql.NVarChar, status)
             .query("INSERT INTO Posts (Platform, Message, PostDate, Status, ImagePath) VALUES (@platform, @message, CAST(@postDate AS DATETIME), @status, @imagePath)");
 
         res.redirect('/');
     } catch (err) { console.log(err); res.send("Eroare: " + err.message); }
 });
 
+// UPDATE
 app.post('/update/:id', checkAuth, upload.single('image'), async (req, res) => {
     try {
         let pool = await sql.connect(dbConfig);
         let cleanDate = req.body.datetime.replace('T', ' ');
         const id = req.params.id;
+        
+        // Verificăm acțiunea (Draft vs Schedule)
+        const status = req.body.action === 'draft' ? 'Draft' : 'Pending';
+
         if (req.file) {
-            await pool.request().input('id', sql.Int, id).input('platform', sql.NVarChar, req.body.platform).input('message', sql.NVarChar, req.body.message).input('postDate', sql.NVarChar, cleanDate).input('imagePath', sql.NVarChar, req.file.filename).query(`UPDATE Posts SET Platform=@platform, Message=@message, PostDate=CAST(@postDate AS DATETIME), ImagePath=@imagePath WHERE Id=@id`);
+            await pool.request()
+                .input('id', sql.Int, id)
+                .input('platform', sql.NVarChar, req.body.platform)
+                .input('message', sql.NVarChar, req.body.message)
+                .input('postDate', sql.NVarChar, cleanDate)
+                .input('imagePath', sql.NVarChar, req.file.filename)
+                .input('status', sql.NVarChar, status) // <--- Actualizăm și statusul
+                .query(`UPDATE Posts SET Platform=@platform, Message=@message, PostDate=CAST(@postDate AS DATETIME), ImagePath=@imagePath, Status=@status WHERE Id=@id`);
         } else {
-            await pool.request().input('id', sql.Int, id).input('platform', sql.NVarChar, req.body.platform).input('message', sql.NVarChar, req.body.message).input('postDate', sql.NVarChar, cleanDate).query(`UPDATE Posts SET Platform=@platform, Message=@message, PostDate=CAST(@postDate AS DATETIME) WHERE Id=@id`);
+            await pool.request()
+                .input('id', sql.Int, id)
+                .input('platform', sql.NVarChar, req.body.platform)
+                .input('message', sql.NVarChar, req.body.message)
+                .input('postDate', sql.NVarChar, cleanDate)
+                .input('status', sql.NVarChar, status) // <--- Actualizăm și statusul
+                .query(`UPDATE Posts SET Platform=@platform, Message=@message, PostDate=CAST(@postDate AS DATETIME), Status=@status WHERE Id=@id`);
         }
         res.redirect('/');
     } catch (err) { res.send("Eroare update: " + err.message); }
@@ -206,7 +297,7 @@ app.post('/delete/:id', checkAuth, async (req, res) => {
 app.get('/calendar', checkAuth, (req, res) => {
     res.render('calendar', {
         user: req.session.user,
-        currentPage: 'calendar' // <--- IDENTIFICATOR PAGINĂ
+        currentPage: 'calendar'
     });
 });
 
@@ -238,11 +329,15 @@ app.get('/api/events', checkAuth, async (req, res) => {
         let pool = await sql.connect(dbConfig);
         let result = await pool.request().query('SELECT * FROM Posts');
         let events = result.recordset.map(post => {
-            let color = '#6c757d';
+            let color = '#6c757d'; // Default (Draft) - Gri
             if (post.Platform === 'Facebook') color = '#0d6efd';
             if (post.Platform === 'Instagram') color = '#dc3545';
             if (post.Platform === 'LinkedIn') color = '#0dcaf0';
             if (post.Platform === 'Twitter') color = '#000000';
+            
+            // Dacă e Draft, o facem puțin transparentă sau gri
+            if (post.Status === 'Draft') color = '#adb5bd';
+
             return {
                 title: `${post.Platform}: ${post.Message.substring(0, 20)}...`,
                 start: formatInputManual(post.PostDate),
@@ -258,7 +353,7 @@ app.get('/api/events', checkAuth, async (req, res) => {
 app.get('/accounts', checkAuth, (req, res) => {
     res.render('accounts', {
         user: req.session.user,
-        currentPage: 'accounts' // <--- Pentru meniul inteligent
+        currentPage: 'accounts'
     });
 });
 
@@ -303,7 +398,7 @@ app.post('/settings/update', checkAuth, async (req, res) => {
 });
 
 // ==============================================
-//               ROBOTUL SIMULATOR 🤖
+//               ROBOTUL SIMULATOR 🤖
 // ==============================================
 cron.schedule('* * * * *', async () => {
     try {
@@ -322,6 +417,24 @@ cron.schedule('* * * * *', async () => {
         }
     } catch (err) { console.log("Eroare Robot:", err); }
 });
+
+// ==============================================
+// ⚠️ RUTELE PENTRU GOOGLE LOGIN (LIPSEAU) ⚠️
+// ==============================================
+
+// 1. Ruta care te trimite la Google când apeși butonul
+app.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+// 2. Ruta unde Google te trimite înapoi (Callback)
+app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/login', session: false }),
+    function (req, res) {
+        // Succes! Salvăm userul în sesiune și intrăm în Dashboard
+        req.session.user = req.user;
+        res.redirect('/');
+    });
+
+// ==============================================
 
 const PORT = 3000;
 app.listen(PORT, () => {

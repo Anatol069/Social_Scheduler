@@ -482,3 +482,364 @@ body {
     background: rgba(10, 102, 194, 0.1);
     color: #0A66C2;
 }
+
+/* === BUFFER STYLE LOGIN 2026 === */
+
+/* Importăm fontul Inter pentru acel look "Clean" */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+.buffer-login-body {
+    font-family: 'Inter', sans-serif !important;
+    background-color: #ffffff;
+    /* Pattern-ul subtil de puncte ca la Buffer */
+    background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+    background-size: 30px 30px;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.buffer-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 460px;
+    padding: 3rem 2.5rem;
+    border-radius: 16px;
+    /* Umbră foarte fină și difuză */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 2px 4px -1px rgba(0, 0, 0, 0.03),
+        0 20px 40px -10px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f0f0f0;
+    z-index: 10;
+    position: relative;
+}
+
+.buffer-title {
+    font-size: 2rem;
+    /* 32px */
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    /* Literele mai apropiate */
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+}
+
+.buffer-subtitle {
+    color: #636363;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    font-weight: 400;
+}
+
+/* Input-uri masive și curate */
+.buffer-input {
+    background-color: #f5f5f5;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 1rem 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.buffer-input:focus {
+    background-color: #fff;
+    border-color: #2c4bff;
+    /* Buffer Blue */
+    box-shadow: 0 0 0 4px rgba(44, 75, 255, 0.15);
+    outline: none;
+}
+
+/* Butonul specific Buffer (Albastru intens) */
+.btn-buffer {
+    background-color: #2c4bff;
+    color: #fff;
+    font-weight: 700;
+    padding: 1rem;
+    border-radius: 8px;
+    border: none;
+    width: 100%;
+    font-size: 1rem;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.btn-buffer:hover {
+    background-color: #1e3ae6;
+    transform: translateY(-1px);
+    color: #fff;
+}
+
+/* Link-uri */
+.buffer-link {
+    color: #2c4bff;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.buffer-link:hover {
+    color: #1e3ae6;
+    text-decoration: underline;
+}
+
+/* === ICONIȚELE PLUTITOARE (Floating Icons) === */
+.floating-icon {
+    position: absolute;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+    animation: floatAnimation 6s ease-in-out infinite;
+    z-index: 1;
+}
+
+/* Definim pozițiile și mărimile pentru haos controlat */
+.icon-pos-1 {
+    top: 15%;
+    left: 10%;
+    font-size: 2.5rem;
+    color: #1877F2;
+    animation-delay: 0s;
+    transform: rotate(-15deg);
+}
+
+/* FB */
+.icon-pos-2 {
+    top: 25%;
+    right: 15%;
+    font-size: 3rem;
+    color: #E1306C;
+    animation-delay: 1.5s;
+    transform: rotate(10deg);
+}
+
+/* Insta */
+.icon-pos-3 {
+    bottom: 20%;
+    left: 15%;
+    font-size: 3.5rem;
+    color: #0A66C2;
+    animation-delay: 0.5s;
+    transform: rotate(-5deg);
+}
+
+/* LinkedIn */
+.icon-pos-4 {
+    bottom: 15%;
+    right: 10%;
+    font-size: 2.8rem;
+    color: #000000;
+    animation-delay: 2s;
+    transform: rotate(20deg);
+}
+
+/* X */
+.icon-pos-5 {
+    top: 10%;
+    left: 50%;
+    font-size: 2rem;
+    color: #FF0000;
+    animation-delay: 1s;
+    transform: translateX(-50%) rotate(5deg);
+}
+
+/* Youtube */
+.icon-pos-6 {
+    bottom: 40%;
+    left: 5%;
+    font-size: 2rem;
+    color: #25D366;
+    animation-delay: 2.5s;
+    transform: rotate(-10deg);
+}
+
+/* WhatsApp */
+
+@keyframes floatAnimation {
+    0% {
+        transform: translateY(0px) rotate(var(--rotation));
+    }
+
+    50% {
+        transform: translateY(-15px) rotate(calc(var(--rotation) + 5deg));
+    }
+
+    100% {
+        transform: translateY(0px) rotate(var(--rotation));
+    }
+}
+
+/* === BUFFER PIXEL-PERFECT LOGIN === */
+
+/* Layout General */
+.buffer-split-layout {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* --- PARTEA STÂNGĂ (FORMULAR) --- */
+.login-left {
+    width: 40%;
+    min-width: 450px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    padding: 60px 80px;
+    position: relative;
+}
+
+/* Brand Logo (Buffer style) */
+.brand-logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    margin-bottom: 60px;
+    /* Spațiu mare până la titlu */
+}
+
+/* Titlul "Log in" */
+.login-header {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 30px;
+    letter-spacing: -0.5px;
+}
+
+/* Etichetele (Labels) */
+.form-label-clean {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* Input-urile */
+.form-input-clean {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 1rem;
+    color: #333;
+    border: 1px solid #ced4da;
+    /* Gri subtil */
+    border-radius: 5px;
+    /* Colțuri abia rotunjite */
+    background-color: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    margin-bottom: 20px;
+}
+
+.form-input-clean:focus {
+    border-color: #2c4bff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(44, 75, 255, 0.1);
+}
+
+/* Butonul Albastru */
+.btn-clean-action {
+    background-color: #2c4bff;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 14px;
+    border: none;
+    border-radius: 5px;
+    width: 100%;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background-color 0.2s;
+}
+
+.btn-clean-action:hover {
+    background-color: #1e3ae6;
+}
+
+/* Link-urile de jos */
+.form-footer-links {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+}
+
+.form-footer-links a {
+    color: #555;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.form-footer-links a:hover {
+    color: #1a1a1a;
+    text-decoration: underline;
+}
+
+/* Footer-ul paginii (Terms, Privacy) */
+.page-footer {
+    margin-top: auto;
+    font-size: 0.8rem;
+    color: #6b7280;
+    display: flex;
+    gap: 15px;
+}
+
+/* --- PARTEA DREAPTĂ (VIZUAL) --- */
+.login-right {
+    width: 60%;
+    background-color: #fcefc7;
+    /* Galbenul din poză */
+    background-image: radial-gradient(#eacb7c 1px, transparent 1px);
+    /* Textură puncte */
+    background-size: 20px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Tag-ul "NEW" */
+.badge-new {
+    background: #fff;
+    border: 1px solid #000;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: inline-block;
+}
+
+.marketing-text {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: #1a1a1a;
+    margin-bottom: 3rem;
+    max-width: 500px;
+}
+
+.mockup-image {
+    max-width: 80%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    background: #fff;
+    padding: 10px;
+}
+
+@media (max-width: 992px) {
+    .login-right {
+        display: none;
+    }
+
+    .login-left {
+        width: 100%;
+        padding: 40px;
+    }
+}
