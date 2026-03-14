@@ -1,0 +1,920 @@
+/********** Template CSS **********/
+:root {
+    --primary: #009CFF;
+    --light: #F3F6F9;
+    --dark: #191C24;
+}
+
+.back-to-top {
+    position: fixed;
+    display: none;
+    right: 45px;
+    bottom: 45px;
+    z-index: 99;
+}
+
+
+/*** Spinner ***/
+#spinner {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .5s ease-out, visibility 0s linear .5s;
+    z-index: 99999;
+}
+
+#spinner.show {
+    transition: opacity .5s ease-out, visibility 0s linear 0s;
+    visibility: visible;
+    opacity: 1;
+}
+
+
+/*** Button ***/
+.btn {
+    transition: .5s;
+}
+
+.btn.btn-primary {
+    color: #FFFFFF;
+}
+
+.btn-square {
+    width: 38px;
+    height: 38px;
+}
+
+.btn-sm-square {
+    width: 32px;
+    height: 32px;
+}
+
+.btn-lg-square {
+    width: 48px;
+    height: 48px;
+}
+
+.btn-square,
+.btn-sm-square,
+.btn-lg-square {
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: normal;
+    border-radius: 50px;
+}
+
+
+/*** Layout ***/
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 250px;
+    height: 100vh;
+    overflow-y: auto;
+    background: var(--light);
+    transition: 0.5s;
+    z-index: 999;
+}
+
+.content {
+    margin-left: 250px;
+    min-height: 100vh;
+    background: #FFFFFF;
+    transition: 0.5s;
+}
+
+@media (min-width: 992px) {
+    .sidebar {
+        margin-left: 0;
+    }
+
+    .sidebar.open {
+        margin-left: -250px;
+    }
+
+    .content {
+        width: calc(100% - 250px);
+    }
+
+    .content.open {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .sidebar {
+        margin-left: -250px;
+    }
+
+    .sidebar.open {
+        margin-left: 0;
+    }
+
+    .content {
+        width: 100%;
+        margin-left: 0;
+    }
+}
+
+
+/*** Navbar ***/
+.sidebar .navbar .navbar-nav .nav-link {
+    padding: 7px 20px;
+    color: var(--dark);
+    font-weight: 500;
+    border-left: 3px solid var(--light);
+    border-radius: 0 30px 30px 0;
+    outline: none;
+}
+
+.sidebar .navbar .navbar-nav .nav-link:hover,
+.sidebar .navbar .navbar-nav .nav-link.active {
+    color: var(--primary);
+    background: #FFFFFF;
+    border-color: var(--primary);
+}
+
+.sidebar .navbar .navbar-nav .nav-link i {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    border-radius: 40px;
+}
+
+.sidebar .navbar .navbar-nav .nav-link:hover i,
+.sidebar .navbar .navbar-nav .nav-link.active i {
+    background: var(--light);
+}
+
+.sidebar .navbar .dropdown-toggle::after {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    border: none;
+    content: "\f107";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    transition: .5s;
+}
+
+.sidebar .navbar .dropdown-toggle[aria-expanded=true]::after {
+    transform: rotate(-180deg);
+}
+
+.sidebar .navbar .dropdown-item {
+    padding-left: 25px;
+    border-radius: 0 30px 30px 0;
+}
+
+.content .navbar .navbar-nav .nav-link {
+    margin-left: 25px;
+    padding: 12px 0;
+    color: var(--dark);
+    outline: none;
+}
+
+.content .navbar .navbar-nav .nav-link:hover,
+.content .navbar .navbar-nav .nav-link.active {
+    color: var(--primary);
+}
+
+.content .navbar .sidebar-toggler,
+.content .navbar .navbar-nav .nav-link i {
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #FFFFFF;
+    border-radius: 40px;
+}
+
+.content .navbar .dropdown-toggle::after {
+    margin-left: 6px;
+    vertical-align: middle;
+    border: none;
+    content: "\f107";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    transition: .5s;
+}
+
+.content .navbar .dropdown-toggle[aria-expanded=true]::after {
+    transform: rotate(-180deg);
+}
+
+@media (max-width: 575.98px) {
+    .content .navbar .navbar-nav .nav-link {
+        margin-left: 15px;
+    }
+}
+
+
+/*** Date Picker ***/
+.bootstrap-datetimepicker-widget.bottom {
+    top: auto !important;
+}
+
+.bootstrap-datetimepicker-widget .table * {
+    border-bottom-width: 0px;
+}
+
+.bootstrap-datetimepicker-widget .table th {
+    font-weight: 500;
+}
+
+.bootstrap-datetimepicker-widget.dropdown-menu {
+    padding: 10px;
+    border-radius: 2px;
+}
+
+.bootstrap-datetimepicker-widget table td.active,
+.bootstrap-datetimepicker-widget table td.active:hover {
+    background: var(--primary);
+}
+
+.bootstrap-datetimepicker-widget table td.today::before {
+    border-bottom-color: var(--primary);
+}
+
+
+/*** Testimonial ***/
+.progress .progress-bar {
+    width: 0px;
+    transition: 2s;
+}
+
+
+/*** Testimonial ***/
+.testimonial-carousel .owl-dots {
+    margin-top: 24px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.testimonial-carousel .owl-dot {
+    position: relative;
+    display: inline-block;
+    margin: 0 5px;
+    width: 15px;
+    height: 15px;
+    border: 5px solid var(--primary);
+    border-radius: 15px;
+    transition: .5s;
+}
+
+.testimonial-carousel .owl-dot.active {
+    background: var(--dark);
+    border-color: var(--primary);
+}
+
+/* --- STILURI NOI PENTRU LOGIN PAGE --- */
+
+.login-container {
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* Partea stângă - Imaginea */
+.login-image-side {
+    /* Imagine de fundal (poți schimba URL-ul cu altă imagine dacă vrei) */
+    background: url('https://images.unsplash.com/photo-1611162617474-5b21e879e113?q=80&w=1974&auto=format&fit=crop') no-repeat center center;
+    background-size: cover;
+    position: relative;
+    min-height: 100vh;
+}
+
+/* Overlay întunecat peste imagine ca să se citească textul */
+.login-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(0, 123, 255, 0.8), rgba(102, 16, 242, 0.8));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    padding: 2rem;
+}
+
+/* Partea dreaptă - Formularul */
+.login-form-side {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    background-color: #f8f9fa;
+}
+
+.form-wrapper {
+    width: 100%;
+    max-width: 450px;
+    background: white;
+    padding: 2.5rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* Input-uri mai moderne */
+.modern-input {
+    border: 2px solid #eee;
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    transition: all 0.3s;
+}
+
+.modern-input:focus {
+    border-color: #009CFF;
+    /* Culoarea primary din tema ta */
+    box-shadow: 0 0 0 4px rgba(0, 156, 255, 0.1);
+}
+
+.btn-modern {
+    border-radius: 10px;
+    padding: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* Link-ul de comutare */
+.toggle-link {
+    color: #009CFF;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.toggle-link:hover {
+    text-decoration: underline;
+}
+
+/* Ascundem formularul care nu e activ */
+.hidden {
+    display: none;
+}
+
+/* === 🎨 MODERN UI OVERHAUL 2026 === */
+
+:root {
+    --primary-gradient: linear-gradient(135deg, #009CFF 0%, #007bff 100%);
+    --secondary-gradient: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    --success-gradient: linear-gradient(135deg, #28a745 0%, #218838 100%);
+    --glass-bg: rgba(255, 255, 255, 0.95);
+    --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.05);
+    --shadow-hover: 0 15px 35px rgba(0, 156, 255, 0.15);
+}
+
+body {
+    background-color: #f3f6f9;
+    /* Un gri foarte deschis, modern */
+    font-family: 'Heebo', sans-serif;
+}
+
+/* 1. CARDURI MODERNE (Soft UI) */
+.bg-light,
+.bg-white {
+    background-color: #ffffff !important;
+    border-radius: 20px !important;
+    /* Colțuri mai rotunde */
+    box-shadow: var(--shadow-soft);
+    border: 1px solid rgba(0, 0, 0, 0.02);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bg-light:hover {
+    transform: translateY(-5px);
+    /* Se ridică puțin la hover */
+    box-shadow: var(--shadow-hover);
+}
+
+/* 2. SIDEBAR MODERN */
+.sidebar {
+    background: #ffffff;
+    box-shadow: 5px 0 25px rgba(0, 0, 0, 0.03);
+}
+
+.sidebar .navbar-nav .nav-link {
+    border-radius: 12px;
+    margin: 5px 15px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.sidebar .navbar-nav .nav-link.active {
+    background: rgba(0, 156, 255, 0.1);
+    /* Albastru foarte pal */
+    color: #009CFF !important;
+    border-left: none;
+    /* Scoatem linia veche */
+    box-shadow: none;
+}
+
+.sidebar .navbar-nav .nav-link:hover {
+    background: #f8f9fa;
+    color: #009CFF;
+    transform: translateX(5px);
+    /* Se mișcă spre dreapta */
+}
+
+/* 3. BUTOANE CU GRADIENT */
+.btn-primary {
+    background: var(--primary-gradient);
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 156, 255, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(0, 156, 255, 0.4);
+}
+
+/* 4. LISTA DE POSTĂRI (Timeline Style) */
+.post-item {
+    border-left: 4px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.post-item:hover {
+    background-color: #f8faff;
+    border-left: 4px solid #009CFF;
+}
+
+.platform-icon-bg {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 1.2rem;
+}
+
+/* Culori specifice pentru iconițe */
+.icon-facebook {
+    background: rgba(24, 119, 242, 0.1);
+    color: #1877F2;
+}
+
+.icon-instagram {
+    background: rgba(225, 48, 108, 0.1);
+    color: #E1306C;
+}
+
+.icon-twitter {
+    background: rgba(29, 161, 242, 0.1);
+    color: #1DA1F2;
+}
+
+/* Sau negru pentru X */
+.icon-linkedin {
+    background: rgba(10, 102, 194, 0.1);
+    color: #0A66C2;
+}
+
+/* === BUFFER STYLE LOGIN 2026 === */
+
+/* Importăm fontul Inter pentru acel look "Clean" */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+.buffer-login-body {
+    font-family: 'Inter', sans-serif !important;
+    background-color: #ffffff;
+    /* Pattern-ul subtil de puncte ca la Buffer */
+    background-image: radial-gradient(#e5e7eb 1px, transparent 1px);
+    background-size: 30px 30px;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+}
+
+.buffer-card {
+    background: #ffffff;
+    width: 100%;
+    max-width: 460px;
+    padding: 3rem 2.5rem;
+    border-radius: 16px;
+    /* Umbră foarte fină și difuză */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05),
+        0 2px 4px -1px rgba(0, 0, 0, 0.03),
+        0 20px 40px -10px rgba(0, 0, 0, 0.08);
+    border: 1px solid #f0f0f0;
+    z-index: 10;
+    position: relative;
+}
+
+.buffer-title {
+    font-size: 2rem;
+    /* 32px */
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    /* Literele mai apropiate */
+    color: #1a1a1a;
+    margin-bottom: 0.5rem;
+}
+
+.buffer-subtitle {
+    color: #636363;
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    font-weight: 400;
+}
+
+/* Input-uri masive și curate */
+.buffer-input {
+    background-color: #f5f5f5;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    padding: 1rem 1rem;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.buffer-input:focus {
+    background-color: #fff;
+    border-color: #2c4bff;
+    /* Buffer Blue */
+    box-shadow: 0 0 0 4px rgba(44, 75, 255, 0.15);
+    outline: none;
+}
+
+/* Butonul specific Buffer (Albastru intens) */
+.btn-buffer {
+    background-color: #2c4bff;
+    color: #fff;
+    font-weight: 700;
+    padding: 1rem;
+    border-radius: 8px;
+    border: none;
+    width: 100%;
+    font-size: 1rem;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.btn-buffer:hover {
+    background-color: #1e3ae6;
+    transform: translateY(-1px);
+    color: #fff;
+}
+
+/* Link-uri */
+.buffer-link {
+    color: #2c4bff;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.buffer-link:hover {
+    color: #1e3ae6;
+    text-decoration: underline;
+}
+
+/* === ICONIȚELE PLUTITOARE (Floating Icons) === */
+.floating-icon {
+    position: absolute;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+    animation: floatAnimation 6s ease-in-out infinite;
+    z-index: 1;
+}
+
+/* Definim pozițiile și mărimile pentru haos controlat */
+.icon-pos-1 {
+    top: 15%;
+    left: 10%;
+    font-size: 2.5rem;
+    color: #1877F2;
+    animation-delay: 0s;
+    transform: rotate(-15deg);
+}
+
+/* FB */
+.icon-pos-2 {
+    top: 25%;
+    right: 15%;
+    font-size: 3rem;
+    color: #E1306C;
+    animation-delay: 1.5s;
+    transform: rotate(10deg);
+}
+
+/* Insta */
+.icon-pos-3 {
+    bottom: 20%;
+    left: 15%;
+    font-size: 3.5rem;
+    color: #0A66C2;
+    animation-delay: 0.5s;
+    transform: rotate(-5deg);
+}
+
+/* LinkedIn */
+.icon-pos-4 {
+    bottom: 15%;
+    right: 10%;
+    font-size: 2.8rem;
+    color: #000000;
+    animation-delay: 2s;
+    transform: rotate(20deg);
+}
+
+/* X */
+.icon-pos-5 {
+    top: 10%;
+    left: 50%;
+    font-size: 2rem;
+    color: #FF0000;
+    animation-delay: 1s;
+    transform: translateX(-50%) rotate(5deg);
+}
+
+/* Youtube */
+.icon-pos-6 {
+    bottom: 40%;
+    left: 5%;
+    font-size: 2rem;
+    color: #25D366;
+    animation-delay: 2.5s;
+    transform: rotate(-10deg);
+}
+
+/* WhatsApp */
+
+@keyframes floatAnimation {
+    0% {
+        transform: translateY(0px) rotate(var(--rotation));
+    }
+
+    50% {
+        transform: translateY(-15px) rotate(calc(var(--rotation) + 5deg));
+    }
+
+    100% {
+        transform: translateY(0px) rotate(var(--rotation));
+    }
+}
+
+/* === BUFFER PIXEL-PERFECT LOGIN === */
+
+/* Layout General */
+.buffer-split-layout {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* --- PARTEA STÂNGĂ (FORMULAR) --- */
+.login-left {
+    width: 40%;
+    min-width: 450px;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    padding: 60px 80px;
+    position: relative;
+}
+
+/* Brand Logo (Buffer style) */
+.brand-logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    display: flex;
+    align-items: center;
+    margin-bottom: 60px;
+    /* Spațiu mare până la titlu */
+}
+
+/* Titlul "Log in" */
+.login-header {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 30px;
+    letter-spacing: -0.5px;
+}
+
+/* Etichetele (Labels) */
+.form-label-clean {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+    display: block;
+}
+
+/* Input-urile */
+.form-input-clean {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 1rem;
+    color: #333;
+    border: 1px solid #ced4da;
+    /* Gri subtil */
+    border-radius: 5px;
+    /* Colțuri abia rotunjite */
+    background-color: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    margin-bottom: 20px;
+}
+
+.form-input-clean:focus {
+    border-color: #2c4bff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(44, 75, 255, 0.1);
+}
+
+/* Butonul Albastru */
+.btn-clean-action {
+    background-color: #2c4bff;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1rem;
+    padding: 14px;
+    border: none;
+    border-radius: 5px;
+    width: 100%;
+    cursor: pointer;
+    margin-bottom: 20px;
+    transition: background-color 0.2s;
+}
+
+.btn-clean-action:hover {
+    background-color: #1e3ae6;
+}
+
+/* Link-urile de jos */
+.form-footer-links {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+}
+
+.form-footer-links a {
+    color: #555;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.form-footer-links a:hover {
+    color: #1a1a1a;
+    text-decoration: underline;
+}
+
+/* Footer-ul paginii (Terms, Privacy) */
+.page-footer {
+    margin-top: auto;
+    font-size: 0.8rem;
+    color: #6b7280;
+    display: flex;
+    gap: 15px;
+}
+
+/* --- PARTEA DREAPTĂ (VIZUAL) --- */
+.login-right {
+    width: 60%;
+    background-color: #fcefc7;
+    /* Galbenul din poză */
+    background-image: radial-gradient(#eacb7c 1px, transparent 1px);
+    /* Textură puncte */
+    background-size: 20px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Tag-ul "NEW" */
+.badge-new {
+    background: #fff;
+    border: 1px solid #000;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    display: inline-block;
+}
+
+.marketing-text {
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.2;
+    color: #1a1a1a;
+    margin-bottom: 3rem;
+    max-width: 500px;
+}
+
+.mockup-image {
+    max-width: 80%;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    background: #fff;
+    padding: 10px;
+}
+
+@media (max-width: 992px) {
+    .login-right {
+        display: none;
+    }
+
+    .login-left {
+        width: 100%;
+        padding: 40px;
+    }
+}
+
+/* ==========================================
+   🌙 DARK MODE STYLES (Modern)
+========================================== */
+body.dark-mode,
+body.dark-mode .content {
+    background-color: #121212 !important;
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .sidebar,
+body.dark-mode .bg-light,
+body.dark-mode .bg-white {
+    background-color: #1e1e1e !important;
+    color: #e0e0e0 !important;
+    border-color: #2d2d2d !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2) !important;
+}
+
+body.dark-mode .text-dark,
+body.dark-mode h1, body.dark-mode h2, body.dark-mode h3, 
+body.dark-mode h4, body.dark-mode h5, body.dark-mode h6,
+body.dark-mode p, body.dark-mode label, body.dark-mode small {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .text-muted {
+    color: #a0a0a0 !important;
+}
+
+/* Sidebar Links in Dark Mode */
+body.dark-mode .sidebar .navbar-nav .nav-link {
+    color: #a0a0a0 !important;
+}
+
+body.dark-mode .sidebar .navbar-nav .nav-link:hover,
+body.dark-mode .sidebar .navbar-nav .nav-link.active {
+    background: rgba(0, 156, 255, 0.15) !important;
+    color: #009CFF !important;
+}
+
+/* Form inputs & dropdowns */
+body.dark-mode .form-control {
+    background-color: #2b2b2b !important;
+    color: #ffffff !important;
+    border: 1px solid #444 !important;
+}
+
+body.dark-mode .form-control:focus {
+    border-color: #009CFF !important;
+    box-shadow: 0 0 0 4px rgba(0, 156, 255, 0.1) !important;
+}
+
+body.dark-mode .dropdown-menu {
+    background-color: #1e1e1e !important;
+    border: 1px solid #333 !important;
+}
+
+body.dark-mode .dropdown-item {
+    color: #e0e0e0 !important;
+}
+
+body.dark-mode .dropdown-item:hover {
+    background-color: #2b2b2b !important;
+}
+
+/* Tabs in Accounts/Settings */
+body.dark-mode .nav-tabs .nav-link {
+    color: #a0a0a0;
+}
+body.dark-mode .nav-tabs .nav-link.active {
+    background-color: #1e1e1e !important;
+    color: #009CFF !important;
+    border-color: #333 #333 #1e1e1e !important;
+}

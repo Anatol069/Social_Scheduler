@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="utf-8">
+    <title>Social Scheduler - Dashboard</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="/img/favicon.ico" rel="icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    
+    <style>
+        /* Stil pentru butonul Magic AI */
+        .btn-magic {
+            background: linear-gradient(45deg, #8e2de2, #4a00e0);
+            color: white;
+            border: none;
+            transition: all 0.3s;
+        }
+        .btn-magic:hover {
+            transform: scale(1.05);
+            color: white;
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.4);
+        }
+        /* Stil pentru Draft */
+        .border-draft { border-left: 4px solid #6c757d !important; background-color: #f8f9fa; }
+        .badge-draft { background-color: #e2e6ea; color: #6c757d; border: 1px solid #ced4da; }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid position-relative bg-white d-flex p-0">
+        <div class="sidebar pe-4 pb-3">
+            <nav class="navbar bg-light navbar-light">
+                <a href="/" class="navbar-brand mx-4 mb-3">
+                    <h3 class="text-primary"><i class="fa fa-hashtag me-2"></i>Scheduler</h3>
+                </a>
+                <div class="d-flex align-items-center ms-4 mb-4">
+                    <div class="position-relative">
+                        <img class="rounded-circle" src="/img/user.jpg" alt="" style="width: 40px; height: 40px;">
+                        <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="mb-0"><%= user ? user.Username : 'Oaspete' %></h6>
+                        <span>Manager</span>
+                    </div>
+                </div>
+                <div class="navbar-nav w-100">
+                    <a href="/" class="nav-item nav-link <%= currentPage === 'dashboard' ? 'active' : '' %>"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+                    <a href="/accounts" class="nav-item nav-link <%= currentPage === 'accounts' ? 'active' : '' %>"><i class="fa fa-users me-2"></i>Conturi</a>
+                    <a href="/stats" class="nav-item nav-link <%= currentPage === 'stats' ? 'active' : '' %>"><i class="fa fa-chart-bar me-2"></i>Statistici</a>
+                    <a href="/calendar" class="nav-item nav-link <%= currentPage === 'calendar' ? 'active' : '' %>"><i class="fa fa-calendar-alt me-2"></i>Calendar</a>
+                    <a href="/settings" class="nav-item nav-link <%= currentPage === 'settings' ? 'active' : '' %>"><i class="fa fa-cog me-2"></i>Setări</a>
+                    <a href="/logout" class="nav-item nav-link text-danger mt-3 border-top pt-3"><i class="fa fa-sign-out-alt me-2"></i>Deconectare</a>
+                </div>
+            </nav>
+        </div>
+
+        <div class="content">
+            <nav class="navbar navbar-expand bg-light navbar-light sticky-top px-4 py-0">
+                <a href="#" class="sidebar-toggler flex-shrink-0"><i class="fa fa-bars"></i></a>
+                
+                <div class="navbar-nav align-items-center ms-auto">
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <img class="rounded-circle me-lg-2" src="/img/user.jpg" alt="" style="width: 40px; height: 40px;">
+                            <span class="d-none d-lg-inline-flex"><%= user ? user.Username : 'User' %></span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
+                            <a href="/settings" class="dropdown-item">Setări</a>
+                            <a href="/logout" class="dropdown-item">Log Out</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <div class="container-fluid pt-4 px-4">
+                
+                <div class="row g-4 mb-4">
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="bg-light rounded d-flex align-items-center justify-content-between p-4 shadow-sm h-100">
+                            <i class="fa fa-paper-plane fa-3x text-primary opacity-25"></i>
+                            <div class="ms-3 text-end">
+                                <p class="mb-2 text-muted">Total</p>
+                                <h6 class="mb-0 fw-bold fs-4"><%= posts.length %></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="bg-light rounded d-flex align-items-center justify-content-between p-4 shadow-sm h-100">
+                            <i class="fa fa-check-circle fa-3x text-success opacity-25"></i>
+                            <div class="ms-3 text-end">
+                                <p class="mb-2 text-muted">Trimise</p>
+                                <h6 class="mb-0 fw-bold fs-4"><%= posts.filter(p => p.status === 'Sent').length %></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="bg-light rounded d-flex align-items-center justify-content-between p-4 shadow-sm h-100">
+                            <i class="fa fa-hourglass-half fa-3x text-warning opacity-25"></i>
+                            <div class="ms-3 text-end">
+                                <p class="mb-2 text-muted">Pending</p>
+                                <h6 class="mb-0 fw-bold fs-4"><%= posts.filter(p => p.status === 'Pending').length %></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-xl-3">
+                        <div class="bg-light rounded d-flex align-items-center justify-content-between p-4 shadow-sm h-100">
+                            <i class="fa fa-pencil-alt fa-3x text-secondary opacity-25"></i>
+                            <div class="ms-3 text-end">
+                                <p class="mb-2 text-muted">Ciorne (Drafts)</p>
+                                <h6 class="mb-0 fw-bold fs-4"><%= posts.filter(p => p.status === 'Draft').length %></h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-sm-12 col-xl-5">
+                        <div class="bg-light rounded h-100 p-4 shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h6 class="mb-0 text-primary fw-bold">
+                                    <%= postToEdit ? '✏️ Editează' : '📝 Creează' %>
+                                </h6>
+                                <button type="button" class="btn btn-sm btn-magic rounded-pill px-3" onclick="generateMagic()">
+                                    <i class="fa fa-wand-magic-sparkles me-2"></i>AI Assist
+                                </button>
+                            </div>
+
+                            <form action="<%= postToEdit ? '/update/' + postToEdit.Id : '/schedule' %>" method="POST" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small fw-bold">PLATFORMA</label>
+                                    <select class="form-select" name="platform">
+                                        <option value="Facebook" <%= postToEdit && postToEdit.Platform === 'Facebook' ? 'selected' : '' %>>Facebook</option>
+                                        <option value="LinkedIn" <%= postToEdit && postToEdit.Platform === 'LinkedIn' ? 'selected' : '' %>>LinkedIn</option>
+                                        <option value="Instagram" <%= postToEdit && postToEdit.Platform === 'Instagram' ? 'selected' : '' %>>Instagram</option>
+                                        <option value="Twitter" <%= postToEdit && postToEdit.Platform === 'Twitter' ? 'selected' : '' %>>X (Twitter)</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small fw-bold">MESAJUL TĂU</label>
+                                    <textarea class="form-control" id="messageInput" name="message" rows="5" placeholder="La ce te gândești azi?"><%= postToEdit ? postToEdit.Message : '' %></textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small fw-bold">POZĂ</label>
+                                    <input class="form-control" type="file" name="image" accept="image/*">
+                                </div>
+
+                                <div class="mb-4">
+                                    <label class="form-label text-muted small fw-bold">DATA ȘI ORA</label>
+                                    <input type="datetime-local" class="form-control" name="datetime" value="<%= postToEdit ? postToEdit.formattedDate : '' %>" required>
+                                </div>
+
+                                <div class="d-flex gap-2">
+                                    <% if (postToEdit) { %>
+                                        <button type="submit" name="action" value="schedule" class="btn btn-warning w-100 py-2 text-white fw-bold">
+                                            <i class="fa fa-save me-2"></i>Salvează
+                                        </button>
+                                        <a href="/" class="btn btn-light w-100 py-2 text-muted">Anulează</a>
+                                    <% } else { %>
+                                        <button type="submit" name="action" value="draft" class="btn btn-secondary w-50 py-2">
+                                            <i class="fa fa-pencil-alt me-2"></i>Ciornă
+                                        </button>
+                                        <button type="submit" name="action" value="schedule" class="btn btn-primary w-50 py-2 fw-bold">
+                                            <i class="fa fa-paper-plane me-2"></i>Programează
+                                        </button>
+                                    <% } %>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12 col-xl-7">
+                        <div class="bg-light rounded h-100 p-4 shadow-sm">
+                            <div class="d-flex align-items-center justify-content-between mb-4">
+                                <h6 class="mb-0 fw-bold text-dark"><i class="fa fa-stream me-2 text-primary"></i>Timeline</h6>
+                                <span class="badge bg-primary rounded-pill px-3"><%= posts.length %></span>
+                            </div>
+
+                            <form action="/" method="GET" class="row g-2 mb-4">
+                                <div class="col-md-5">
+                                    <select class="form-select form-select-sm" name="platform" onchange="this.form.submit()">
+                                        <option value="All" <%=filters.platform==='All'?'selected':''%>>Toate Platformele</option>
+                                        <option value="Facebook" <%=filters.platform==='Facebook'?'selected':''%>>Facebook</option>
+                                        <option value="Instagram" <%=filters.platform==='Instagram'?'selected':''%>>Instagram</option>
+                                        <option value="Twitter" <%=filters.platform==='Twitter'?'selected':''%>>X (Twitter)</option>
+                                        <option value="LinkedIn" <%=filters.platform==='LinkedIn'?'selected':''%>>LinkedIn</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-5">
+                                    <select class="form-select form-select-sm" name="status" onchange="this.form.submit()">
+                                        <option value="All" <%=filters.status==='All'?'selected':''%>>Toate Statusurile</option>
+                                        <option value="Sent" <%=filters.status==='Sent'?'selected':''%>>✅ Trimise</option>
+                                        <option value="Pending" <%=filters.status==='Pending'?'selected':''%>>⏳ În Așteptare</option>
+                                        <option value="Draft" <%=filters.status==='Draft'?'selected':''%>>📝 Ciorne</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <a href="/" class="btn btn-sm btn-outline-secondary w-100"><i class="fa fa-redo"></i></a>
+                                </div>
+                            </form>
+
+                            <div class="timeline-container" style="max-height: 600px; overflow-y: auto; padding-right: 5px;">
+                                <% posts.forEach(function(post) { %>
+                                    <div class="d-flex align-items-start border-bottom py-3 post-item px-2 <%= post.status === 'Draft' ? 'border-draft opacity-75' : '' %>">
+                                        
+                                        <div class="platform-icon-bg me-3 shadow-sm flex-shrink-0 <%= 
+                                            post.platform === 'Facebook' ? 'icon-facebook' : 
+                                            post.platform === 'Instagram' ? 'icon-instagram' : 
+                                            post.platform === 'Twitter' ? 'icon-twitter' : 'icon-linkedin' 
+                                        %>">
+                                            <i class="<%= post.icon %>"></i>
+                                        </div>
+
+                                        <div class="w-100">
+                                            <div class="d-flex w-100 justify-content-between mb-1">
+                                                <h6 class="mb-0 fw-bold text-dark"><%= post.platform %></h6>
+                                                <small class="text-muted" style="font-size: 0.8rem;">
+                                                    <i class="far fa-clock me-1"></i><%= post.datetime %>
+                                                </small>
+                                            </div>
+                                            
+                                            <p class="mb-2 text-secondary text-truncate" style="max-width: 350px;">
+                                                <%= post.message %>
+                                            </p>
+                                            
+                                            <div class="d-flex align-items-center flex-wrap gap-2">
+                                                <% if (post.status === 'Sent') { %>
+                                                    <span class="badge bg-success-soft text-success border border-success px-2 py-1 rounded-pill" style="font-size: 0.7rem;">Trimis</span>
+                                                    <span class="ms-2 text-muted small" title="Impact"><i class="fa fa-eye me-1"></i><%= Math.floor(Math.random() * 500) + 50 %></span>
+                                                    <span class="ms-2 text-muted small" title="Aprecieri"><i class="fa fa-heart me-1 text-danger"></i><%= Math.floor(Math.random() * 50) + 5 %></span>
+                                                
+                                                <% } else if (post.status === 'Pending') { %>
+                                                    <span class="badge bg-warning-soft text-warning border border-warning px-2 py-1 rounded-pill" style="font-size: 0.7rem;">În așteptare</span>
+                                                
+                                                <% } else if (post.status === 'Draft') { %>
+                                                    <span class="badge badge-draft px-2 py-1 rounded-pill" style="font-size: 0.7rem;">CIORNĂ</span>
+                                                <% } %>
+                                            </div>
+                                        </div>
+
+                                        <div class="ms-3 d-flex flex-column gap-2">
+                                            <a href="/edit/<%= post.id %>" class="btn btn-sm btn-white border shadow-sm text-primary"><i class="fa fa-pen"></i></a>
+                                            <button onclick="confirmDelete('<%= post.id %>')" class="btn btn-sm btn-white border shadow-sm text-danger"><i class="fa fa-trash"></i></button>
+                                        </div>
+                                    </div>
+                                <% }); %>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container-fluid pt-4 px-4">
+                <div class="bg-light rounded-top p-4">
+                    <div class="row">
+                        <div class="col-12 text-center">
+                            &copy; <a href="#">Social Scheduler</a>, All Right Reserved.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a href="#" class="btn btn-lg btn-primary btn-lg-square back-to-top"><i class="bi bi-arrow-up"></i></a>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/lib/chart/chart.min.js"></script>
+    <script src="/lib/easing/easing.min.js"></script>
+    <script src="/lib/waypoints/waypoints.min.js"></script>
+    <script src="/lib/owlcarousel/owl.carousel.min.js"></script>
+    <script src="/js/main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        // 1. Ștergere
+        function confirmDelete(id) {
+            Swal.fire({
+                title: 'Ștergi postarea?',
+                text: "Această acțiune este permanentă.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Da, șterge!',
+                cancelButtonText: 'Nu'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/delete/' + id;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            })
+        }
+
+        // 2. AI Assistant (Simulator)
+        function generateMagic() {
+            const hashtags = [" #SocialMedia", " #Marketing", " #Viral", " #Trending", " #Business", " #Success", " #Innovation"];
+            const intros = ["🚀 Noutăți interesante: ", "🔥 Nu rata asta: ", "✨ Inspirația zilei: ", "📢 Anunț important: "];
+            
+            const randomTag1 = hashtags[Math.floor(Math.random() * hashtags.length)];
+            const randomTag2 = hashtags[Math.floor(Math.random() * hashtags.length)];
+            const randomIntro = intros[Math.floor(Math.random() * intros.length)];
+            
+            const input = document.getElementById('messageInput');
+            
+            // Adaugă textul magic
+            if(input.value === "") {
+                input.value = randomIntro + "Scrie aici ideea ta..." + randomTag1 + randomTag2;
+            } else {
+                input.value += randomTag1 + randomTag2;
+            }
+
+            // Animație de succes
+            Swal.fire({
+                icon: 'success',
+                title: 'AI Magic Applied! ✨',
+                text: 'Am adăugat hashtags și structură textului tău.',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        }
+    </script>
+</body>
+</html>

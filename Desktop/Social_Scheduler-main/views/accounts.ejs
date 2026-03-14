@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ro">
+
+<head>
+    <meta charset="utf-8">
+    <title>Conturi - Social Scheduler</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <link href="/img/favicon.ico" rel="icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container-fluid position-relative bg-white d-flex p-0">
+        <div class="sidebar pe-4 pb-3">
+            <nav class="navbar bg-light navbar-light">
+                <a href="/" class="navbar-brand mx-4 mb-3">
+                    <h3 class="text-primary"><i class="fa fa-hashtag me-2"></i>Scheduler</h3>
+                </a>
+                <div class="d-flex align-items-center ms-4 mb-4">
+                    <div class="position-relative">
+                        <img class="rounded-circle" src="/img/user.jpg" alt="" style="width: 40px; height: 40px;">
+                        <div class="bg-success rounded-circle border border-2 border-white position-absolute end-0 bottom-0 p-1"></div>
+                    </div>
+                    <div class="ms-3">
+                        <h6 class="mb-0"><%= user ? user.Username : 'Oaspete' %></h6>
+                        <span>Manager</span>
+                    </div>
+                </div>
+                <div class="navbar-nav w-100">
+                    <a href="/" class="nav-item nav-link"><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a>
+                    <a href="/accounts" class="nav-item nav-link active"><i class="fa fa-users me-2"></i>Conturi</a>
+                    <a href="/stats" class="nav-item nav-link"><i class="fa fa-chart-bar me-2"></i>Statistici</a>
+                    <a href="/calendar" class="nav-item nav-link"><i class="fa fa-calendar-alt me-2"></i>Calendar</a>
+                    <a href="/settings" class="nav-item nav-link"><i class="fa fa-cog me-2"></i>Setări</a>
+                    <a href="/logout" class="nav-item nav-link text-danger mt-3 border-top pt-3"><i class="fa fa-sign-out-alt me-2"></i>Deconectare</a>
+                </div>
+            </nav>
+        </div>
+
+        <div class="content">
+            <nav class="navbar navbar-expand bg-light navbar-light sticky-top px-4 py-0">
+                <a href="#" class="sidebar-toggler flex-shrink-0"><i class="fa fa-bars"></i></a>
+                <div class="navbar-nav align-items-center ms-auto">
+                    
+                    <div class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+                            <img class="rounded-circle me-lg-2" src="/img/user.jpg" alt="" style="width: 40px; height: 40px;">
+                            <span class="d-none d-lg-inline-flex">
+                                <%= user ? user.Username : 'User' %>
+                            </span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0">
+                            <a href="/settings" class="dropdown-item">Setări</a>
+                            <a href="/logout" class="dropdown-item">Log Out</a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+            <div class="container-fluid pt-4 px-4">
+                <div class="row g-4 mb-4">
+                    <div class="col-12">
+                        <div class="bg-light rounded h-100 p-4 shadow-sm">
+                            <h6 class="mb-4">🔗 Gestionare Conturi Social Media</h6>
+                            <p class="text-muted mb-4">Selectează platformele pentru configurare API.</p>
+
+                            <div class="row g-4">
+                                <div class="col-sm-6 col-xl-3">
+                                    <div class="bg-white rounded d-flex flex-column align-items-center justify-content-center p-4 shadow-sm h-100">
+                                        <i class="fab fa-facebook fa-3x text-primary mb-3"></i>
+                                        <h5 class="mb-0">Facebook</h5>
+                                        <small class="text-muted mb-3">Pagini & Grupuri</small>
+                                        <span class="badge <%= credentials && credentials.FbAccessToken ? 'bg-success' : 'bg-secondary' %> w-100 py-2">
+                                            <i class="fa <%= credentials && credentials.FbAccessToken ? 'fa-check' : 'fa-times' %> me-2"></i>
+                                            <%= credentials && credentials.FbAccessToken ? 'Configurat' : 'Neconfigurat' %>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-xl-3">
+                                    <div class="bg-white rounded d-flex flex-column align-items-center justify-content-center p-4 shadow-sm h-100">
+                                        <i class="fab fa-twitter fa-3x text-dark mb-3"></i>
+                                        <h5 class="mb-0">X (Twitter)</h5>
+                                        <small class="text-muted mb-3">Profile & Tweets</small>
+                                        <span class="badge <%= credentials && credentials.TwAccessToken ? 'bg-success' : 'bg-secondary' %> w-100 py-2">
+                                            <i class="fa <%= credentials && credentials.TwAccessToken ? 'fa-check' : 'fa-times' %> me-2"></i>
+                                            <%= credentials && credentials.TwAccessToken ? 'Configurat' : 'Neconfigurat' %>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-xl-3">
+                                    <div class="bg-white rounded d-flex flex-column align-items-center justify-content-center p-4 shadow-sm h-100 opacity-50">
+                                        <i class="fab fa-instagram fa-3x text-danger mb-3"></i>
+                                        <h5 class="mb-0">Instagram</h5>
+                                        <small class="text-muted mb-3">În curând</small>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-xl-3">
+                                    <div class="bg-white rounded d-flex flex-column align-items-center justify-content-center p-4 shadow-sm h-100 opacity-50">
+                                        <i class="fab fa-linkedin fa-3x text-info mb-3"></i>
+                                        <h5 class="mb-0">LinkedIn</h5>
+                                        <small class="text-muted mb-3">În curând</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="bg-light rounded p-4 shadow-sm">
+                            <h6 class="mb-4">🔑 Setări API Platforme Sociale</h6>
+                            <ul class="nav nav-tabs mb-4" id="apiTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active fw-bold" id="twitter-tab" data-bs-toggle="tab" data-bs-target="#twitter" type="button" role="tab">
+                                        <i class="fab fa-twitter me-2"></i>Twitter (X)
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link fw-bold" id="facebook-tab" data-bs-toggle="tab" data-bs-target="#facebook" type="button" role="tab">
+                                        <i class="fab fa-facebook me-2"></i>Facebook
+                                    </button>
+                                </li>
+                            </ul>
+
+                            <form action="/accounts/api-credentials" method="POST">
+                                <div class="tab-content" id="apiTabsContent">
+                                    <div class="tab-pane fade show active" id="twitter" role="tabpanel">
+                                        <p class="text-muted small">Vizitează <a href="https://developer.twitter.com/en/portal/dashboard" target="_blank" class="text-primary fw-bold text-decoration-underline">Twitter Developer Portal</a> pentru a obține cheile API.</p>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">Account ID *</label>
+                                            <input type="text" class="form-control" name="TwAccountId" value="<%= credentials ? credentials.TwAccountId : '' %>" placeholder="Ex: 1183058513...">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">API Key *</label>
+                                            <input type="text" class="form-control" name="TwApiKey" value="<%= credentials ? credentials.TwApiKey : '' %>" placeholder="Consumer API Key">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">API Secret Key *</label>
+                                            <input type="password" class="form-control" name="TwApiSecret" value="<%= credentials ? credentials.TwApiSecret : '' %>" placeholder="Consumer API Secret Key">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">Access Token *</label>
+                                            <input type="text" class="form-control" name="TwAccessToken" value="<%= credentials ? credentials.TwAccessToken : '' %>" placeholder="Access Token">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">Access Token Secret *</label>
+                                            <input type="password" class="form-control" name="TwAccessSecret" value="<%= credentials ? credentials.TwAccessSecret : '' %>" placeholder="Access Token Secret">
+                                        </div>
+                                    </div>
+
+                                    <div class="tab-pane fade" id="facebook" role="tabpanel">
+                                        <p class="text-muted small">Vizitează <a href="https://developers.facebook.com/apps/" target="_blank" class="text-primary fw-bold text-decoration-underline">Facebook for Developers</a> pentru a obține credențialele.</p>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">App ID *</label>
+                                            <input type="text" class="form-control" name="FbAppId" value="<%= credentials ? credentials.FbAppId : '' %>" placeholder="Ex: 24280704...">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">Page ID *</label>
+                                            <input type="text" class="form-control" name="FbPageId" value="<%= credentials ? credentials.FbPageId : '' %>" placeholder="Ex: 2899057...">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">App Secret *</label>
+                                            <input type="password" class="form-control" name="FbAppSecret" value="<%= credentials ? credentials.FbAppSecret : '' %>" placeholder="App Secret">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label small fw-bold">Access Token *</label>
+                                            <input type="password" class="form-control" name="FbAccessToken" value="<%= credentials ? credentials.FbAccessToken : '' %>" placeholder="Page Access Token">
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary px-4 mt-3"><i class="fa fa-save me-2"></i>Salvează Cheile API</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/main.js"></script>
+</body>
+
+</html>
